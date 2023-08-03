@@ -1,0 +1,8 @@
+{
+  "urls": {
+    "baseURL": "http://20.213.56.61:5000",
+    "signIn": "/signin",
+    "signUp": "/signup"
+  },
+  "roleShortCode": "PU"
+}
