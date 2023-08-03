@@ -28,6 +28,7 @@ function CarsModal(props) {
   const [inputCategoryId, setInputCategoryId] = useState(null);
   const [inputCarName, setInputCarName] = useState("");
 
+  const userData = JSON.parse(localStorage.getItem("userData"));
   useEffect(() => {
     setInputCategoryId(dataToEdit?.categoryId);
     setInputCarName(dataToEdit?.carName);
@@ -64,19 +65,31 @@ function CarsModal(props) {
   const handleSave = () => {
     if (isOpenDialogMode === "Add") {
       axios
-        .post(config.baseURL + config.addCars, {
-          carName: inputCarName,
-          categoryId: inputCategoryId,
-        })
+        .post(
+          config.baseURL + config.addCars,
+          {
+            carName: inputCarName,
+            categoryId: inputCategoryId,
+          },
+          {
+            headers: { authorization: `bearer ${userData.token}` },
+          }
+        )
         .then((res) => {
           hasSuccess();
         });
     } else {
       axios
-        .patch(config.baseURL + config.getCars + `/${dataToEdit.id}`, {
-          carName: inputCarName,
-          categoryId: inputCategoryId,
-        })
+        .patch(
+          config.baseURL + config.getCars + `/${dataToEdit.id}`,
+          {
+            carName: inputCarName,
+            categoryId: inputCategoryId,
+          },
+          {
+            headers: { authorization: `bearer ${userData.token}` },
+          }
+        )
         .then((res) => {
           hasSuccess();
         });

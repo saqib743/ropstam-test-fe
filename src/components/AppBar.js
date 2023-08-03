@@ -154,6 +154,7 @@ function ResponsiveAppBar() {
                   key={setting}
                   onClick={() => {
                     localStorage.removeItem("isLoggedIn");
+                    localStorage.removeItem("userData");
                     router("/login");
                     handleCloseUserMenu();
                   }}

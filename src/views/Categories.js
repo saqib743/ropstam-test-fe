@@ -13,14 +13,19 @@ function Categories(props) {
   const [isOpenDialogMode, setIsOpenDialogMode] = useState("");
   const [dataToEdit, setDataToEdit] = useState({});
   const [categories, setCategories] = useState([]);
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   const getCategories = () => {
-    axios.get(config.baseURL + config.getCategories).then((res) => {
-      const newCat = res.data.categories.map((cat) => {
-        return { ...cat, id: cat._id };
+    axios
+      .get(config.baseURL + config.getCategories, {
+        headers: { authorization: `bearer ${userData.token}` },
+      })
+      .then((res) => {
+        const newCat = res.data.categories.map((cat) => {
+          return { ...cat, id: cat._id };
+        });
+        setCategories(newCat);
       });
-      setCategories(newCat);
-    });
   };
 
   useEffect(() => {
@@ -36,7 +41,12 @@ function Categories(props) {
         const handleDelete = () => {
           // Handle the button click for the specific row here
           axios
-            .delete(config.baseURL + config.getCategories + `/${params.row.id}`)
+            .delete(
+              config.baseURL + config.getCategories + `/${params.row.id}`,
+              {
+                headers: { authorization: `bearer ${userData.token}` },
+              }
+            )
             .then(() => {
               getCategories();
             });

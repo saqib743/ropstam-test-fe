@@ -25,6 +25,7 @@ function CategoriesModal(props) {
 
   const [inputCategoryName, setInputCategoryName] = useState();
 
+  const userData = JSON.parse(localStorage.getItem("userData"));
   useEffect(() => {
     setInputCategoryName(dataToEdit?.categoryName);
   }, [dataToEdit]);
@@ -57,17 +58,29 @@ function CategoriesModal(props) {
   const handleSave = () => {
     if (isOpenDialogMode === "Add") {
       axios
-        .post(config.baseURL + config.addCategories, {
-          categoryName: inputCategoryName,
-        })
+        .post(
+          config.baseURL + config.addCategories,
+          {
+            categoryName: inputCategoryName,
+          },
+          {
+            headers: { authorization: `bearer ${userData.token}` },
+          }
+        )
         .then((res) => {
           hasSuccess();
         });
     } else {
       axios
-        .patch(config.baseURL + config.getCategories + `/${dataToEdit.id}`, {
-          categoryName: inputCategoryName,
-        })
+        .patch(
+          config.baseURL + config.getCategories + `/${dataToEdit.id}`,
+          {
+            categoryName: inputCategoryName,
+          },
+          {
+            headers: { authorization: `bearer ${userData.token}` },
+          }
+        )
         .then((res) => {
           hasSuccess();
         });

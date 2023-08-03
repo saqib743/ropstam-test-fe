@@ -14,22 +14,31 @@ function Cars(props) {
   const [dataToEdit, setDataToEdit] = useState({});
   const [cars, setCars] = useState([]);
   const [categories, setCategories] = useState([]);
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   const getCars = () => {
-    axios.get(config.baseURL + config.getCars).then((res) => {
-      const newCars = res.data.cars.map((car) => {
-        return { ...car, id: car._id, catName: car.category[0].categoryName };
+    axios
+      .get(config.baseURL + config.getCars, {
+        headers: { authorization: `bearer ${userData.token}` },
+      })
+      .then((res) => {
+        const newCars = res.data.cars.map((car) => {
+          return { ...car, id: car._id, catName: car.category[0].categoryName };
+        });
+        setCars(newCars);
       });
-      setCars(newCars);
-    });
   };
   const getCategories = () => {
-    axios.get(config.baseURL + config.getCategories).then((res) => {
-      const newCat = res.data.categories.map((cat) => {
-        return { ...cat, id: cat._id };
+    axios
+      .get(config.baseURL + config.getCategories, {
+        headers: { authorization: `bearer ${userData.token}` },
+      })
+      .then((res) => {
+        const newCat = res.data.categories.map((cat) => {
+          return { ...cat, id: cat._id };
+        });
+        setCategories(newCat);
       });
-      setCategories(newCat);
-    });
   };
   useEffect(() => {
     getCars();
@@ -47,7 +56,9 @@ function Cars(props) {
         const handleDelete = () => {
           // Handle the button click for the specific row here
           axios
-            .delete(config.baseURL + config.getCars + `/${params.row.id}`)
+            .delete(config.baseURL + config.getCars + `/${params.row.id}`, {
+              headers: { authorization: `bearer ${userData.token}` },
+            })
             .then(() => {
               getCars();
             });
