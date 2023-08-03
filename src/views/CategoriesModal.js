@@ -1,6 +1,6 @@
 import { withStyles } from "@mui/styles";
 import styles from "../resources/styles/helpers-styles/SignIn";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -10,12 +10,24 @@ import {
   Typography,
 } from "@mui/material";
 import Joi from "joi";
-
+import config from "../config.json";
+import axios from "axios";
 function CategoriesModal(props) {
-  const { isOpenDialog, setIsOpenDialog, isOpenDialogMode } = props;
+  const {
+    isOpenDialog,
+    setIsOpenDialog,
+    isOpenDialogMode,
+    hasSuccess,
+    dataToEdit,
+  } = props;
+  console.log(dataToEdit);
   const [errors, setErrors] = useState({});
 
-  const [inputCategoryName, setInputCategoryName] = useState(null);
+  const [inputCategoryName, setInputCategoryName] = useState();
+
+  useEffect(() => {
+    setInputCategoryName(dataToEdit?.categoryName);
+  }, [dataToEdit]);
 
   const schema = Joi.object({
     inputCategoryName: Joi.string()
@@ -39,6 +51,26 @@ function CategoriesModal(props) {
       });
       setErrors(validationErrors);
     } else {
+      handleSave();
+    }
+  };
+  const handleSave = () => {
+    if (isOpenDialogMode === "add") {
+      axios
+        .post(config.baseURL + config.addCategories, {
+          categoryName: inputCategoryName,
+        })
+        .then((res) => {
+          hasSuccess();
+        });
+    } else {
+      axios
+        .patch(config.baseURL + config.getCategories + `/${dataToEdit.id}`, {
+          categoryName: inputCategoryName,
+        })
+        .then((res) => {
+          hasSuccess();
+        });
     }
   };
   return (
@@ -57,6 +89,7 @@ function CategoriesModal(props) {
         <form onSubmit={handleSubmit}>
           <Typography fontWeight={"600"}>Category Name</Typography>
           <TextField
+            value={inputCategoryName}
             error={errors.inputCategoryName !== undefined}
             type="text"
             fullWidth

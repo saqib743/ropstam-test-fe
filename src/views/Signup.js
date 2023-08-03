@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Joi from "joi";
 import { Box, Button, TextField, Typography } from "@mui/material";
+import axios from "axios";
+import config from "../config.json";
 function SignUp(props) {
   const [inputEmail, setInputEmail] = useState("");
 
@@ -34,9 +36,17 @@ function SignUp(props) {
       });
       setErrors(validationErrors);
     } else {
-      // Validation passed, handle form submission
-      // For example, you can make an API call here
+      handleSignup();
     }
+  };
+  const handleSignup = () => {
+    axios
+      .post(config.baseURL + config.signUp, {
+        email: inputEmail,
+      })
+      .then((res) => {
+        router("/login");
+      });
   };
   return (
     <Box

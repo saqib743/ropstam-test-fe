@@ -1,25 +1,51 @@
 import { withStyles } from "@mui/styles";
 import styles from "../resources/styles/helpers-styles/SignIn";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button } from "@mui/material";
 
 import { DataGrid } from "@mui/x-data-grid";
 import CategoriesModal from "./CategoriesModal";
+import axios from "axios";
+import config from "../config.json";
 
 function Categories(props) {
   const [isOpenDialog, setIsOpenDialog] = useState(false);
   const [isOpenDialogMode, setIsOpenDialogMode] = useState("");
+  const [dataToEdit, setDataToEdit] = useState({});
+  const [categories, setCategories] = useState([]);
+
+  const getCategories = () => {
+    axios.get(config.baseURL + config.getCategories).then((res) => {
+      const newCat = res.data.categories.map((cat) => {
+        return { ...cat, id: cat._id };
+      });
+      setCategories(newCat);
+    });
+  };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
   const columns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Name", width: 200 },
+    { field: "categoryName", headerName: "Name", width: 700 },
     {
       field: "actions",
       headerName: "Actions",
-      width: 200,
+      width: 250,
       renderCell: (params) => {
+        const handleDelete = () => {
+          // Handle the button click for the specific row here
+          axios
+            .delete(config.baseURL + config.getCategories + `/${params.row.id}`)
+            .then(() => {
+              getCategories();
+            });
+        };
         const handleButtonClick = () => {
           // Handle the button click for the specific row here
           console.log("Button clicked for row with id:", params.row.id);
+          setDataToEdit(params.row);
+
           setIsOpenDialog(true);
           setIsOpenDialogMode("Update");
         };
@@ -33,11 +59,7 @@ function Categories(props) {
             >
               Update
             </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleButtonClick}
-            >
+            <Button variant="contained" color="error" onClick={handleDelete}>
               Delete
             </Button>
           </Box>
@@ -46,15 +68,6 @@ function Categories(props) {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      name: "John Doe",
-    },
-    { id: 2, name: "Jane Doe" },
-    { id: 3, name: "Bob Smith" },
-    { id: 3, name: "Bob Smith" },
-  ];
   const handleSubmit = () => {
     console.log("eee");
   };
@@ -66,6 +79,11 @@ function Categories(props) {
         isOpenDialogMode={isOpenDialogMode}
         setIsOpenDialog={setIsOpenDialog}
         handleSubmit={handleSubmit}
+        dataToEdit={dataToEdit}
+        hasSuccess={() => {
+          getCategories();
+          setIsOpenDialog(false);
+        }}
       />
       <Box
         style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}
@@ -87,11 +105,10 @@ function Categories(props) {
             Add Category
           </Button>
           <DataGrid
-            rows={rows}
+            rows={categories}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            checkboxSelection
             disableSelectionOnClick
           />
         </Box>{" "}

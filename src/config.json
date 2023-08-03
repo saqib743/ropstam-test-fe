@@ -1,8 +1,7 @@
 {
-  "urls": {
-    "baseURL": "http://20.213.56.61:5000",
-    "signIn": "/signin",
-    "signUp": "/signup"
-  },
-  "roleShortCode": "PU"
+  "baseURL": "http://localhost:5000",
+  "login": "/users/login",
+  "signUp": "/users/signup",
+  "getCategories": "/categories",
+  "addCategories": "/categories/create"
 }

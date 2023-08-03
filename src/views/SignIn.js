@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Joi from "joi";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import config from "../config.json";
 
 function SignIn(props) {
   const [inputEmail, setInputEmail] = useState("");
@@ -20,6 +22,7 @@ function SignIn(props) {
           "Invalid email format. Please provide a valid email address.",
       }),
     password: Joi.string()
+      .min(8)
       .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
       .required(),
   });
@@ -39,8 +42,20 @@ function SignIn(props) {
       });
       setErrors(validationErrors);
     } else {
-      router("/cars");
+      handleLogin();
     }
+  };
+  const handleLogin = () => {
+    axios
+      .post(config.baseURL + config.login, {
+        email: inputEmail,
+        password: inputPassword,
+      })
+      .then((res) => {
+        localStorage.setItem("userData", JSON.stringify(res.data));
+        localStorage.setItem("isLoggedIn", true);
+        router("/cars");
+      });
   };
   return (
     <Box
@@ -63,7 +78,10 @@ function SignIn(props) {
             fullWidth
             disableUnderline
             placeholder="Enter email"
-            onChange={(event) => setInputEmail(event.target.value)}
+            onChange={(event) => {
+              setInputEmail(event.target.value);
+              setErrors({});
+            }}
           />
           {errors.email && <span style={{ color: "red" }}>{errors.email}</span>}
           <Typography fontWeight={"600"} style={{ marginTop: "20px" }}>
@@ -75,7 +93,10 @@ function SignIn(props) {
             fullWidth
             disableUnderline
             placeholder="Enter password"
-            onChange={(event) => setInputPassword(event.target.value)}
+            onChange={(event) => {
+              setInputPassword(event.target.value);
+              setErrors({});
+            }}
           />
           {errors.password && (
             <span style={{ color: "red" }}>{errors.password}</span>
