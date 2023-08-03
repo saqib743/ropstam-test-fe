@@ -1,18 +1,8 @@
 import { withStyles } from "@mui/styles";
 import styles from "../resources/styles/helpers-styles/SignIn";
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Input,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Joi from "joi";
-import { useNavigate } from "react-router-dom";
+import { Box, Button } from "@mui/material";
+
 import { DataGrid } from "@mui/x-data-grid";
 import CarsModal from "./CarsModal";
 
