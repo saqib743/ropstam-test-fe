@@ -20,7 +20,7 @@ function CategoriesModal(props) {
     hasSuccess,
     dataToEdit,
   } = props;
-  console.log(dataToEdit);
+
   const [errors, setErrors] = useState({});
 
   const [inputCategoryName, setInputCategoryName] = useState();
@@ -55,7 +55,7 @@ function CategoriesModal(props) {
     }
   };
   const handleSave = () => {
-    if (isOpenDialogMode === "add") {
+    if (isOpenDialogMode === "Add") {
       axios
         .post(config.baseURL + config.addCategories, {
           categoryName: inputCategoryName,

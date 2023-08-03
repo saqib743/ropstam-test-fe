@@ -100,6 +100,7 @@ function Categories(props) {
             onClick={() => {
               setIsOpenDialog(true);
               setIsOpenDialogMode("Add");
+              setDataToEdit({});
             }}
           >
             Add Category

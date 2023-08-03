@@ -3,5 +3,7 @@
   "login": "/users/login",
   "signUp": "/users/signup",
   "getCategories": "/categories",
-  "addCategories": "/categories/create"
+  "addCategories": "/categories/create",
+  "getCars": "/cars",
+  "addCars": "/cars/create"
 }

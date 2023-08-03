@@ -1,27 +1,61 @@
 import { withStyles } from "@mui/styles";
 import styles from "../resources/styles/helpers-styles/SignIn";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button } from "@mui/material";
 
 import { DataGrid } from "@mui/x-data-grid";
 import CarsModal from "./CarsModal";
+import axios from "axios";
+import config from "../config.json";
 
 function Cars(props) {
   const [isOpenDialog, setIsOpenDialog] = useState(false);
   const [isOpenDialogMode, setIsOpenDialogMode] = useState("");
+  const [dataToEdit, setDataToEdit] = useState({});
+  const [cars, setCars] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  const getCars = () => {
+    axios.get(config.baseURL + config.getCars).then((res) => {
+      const newCars = res.data.cars.map((car) => {
+        return { ...car, id: car._id, catName: car.category[0].categoryName };
+      });
+      setCars(newCars);
+    });
+  };
+  const getCategories = () => {
+    axios.get(config.baseURL + config.getCategories).then((res) => {
+      const newCat = res.data.categories.map((cat) => {
+        return { ...cat, id: cat._id };
+      });
+      setCategories(newCat);
+    });
+  };
+  useEffect(() => {
+    getCars();
+    getCategories();
+  }, []);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Name", width: 200 },
-    { field: "category", headerName: "Category", width: 200 },
+    { field: "carName", headerName: "Name", width: 400 },
+    { field: "catName", headerName: "Category", width: 200 },
     {
       field: "actions",
       headerName: "Actions",
       width: 200,
       renderCell: (params) => {
+        const handleDelete = () => {
+          // Handle the button click for the specific row here
+          axios
+            .delete(config.baseURL + config.getCars + `/${params.row.id}`)
+            .then(() => {
+              getCars();
+            });
+        };
         const handleButtonClick = () => {
           // Handle the button click for the specific row here
           console.log("Button clicked for row with id:", params.row.id);
+          setDataToEdit(params.row);
           setIsOpenDialog(true);
           setIsOpenDialogMode("Update");
         };
@@ -35,27 +69,13 @@ function Cars(props) {
             >
               Update
             </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleButtonClick}
-            >
+            <Button variant="contained" color="error" onClick={handleDelete}>
               Delete
             </Button>
           </Box>
         );
       },
     },
-  ];
-
-  const rows = [
-    {
-      id: 1,
-      name: "John Doe",
-    },
-    { id: 2, name: "Jane Doe" },
-    { id: 3, name: "Bob Smith" },
-    { id: 3, name: "Bob Smith" },
   ];
 
   const handleSubmit = () => {
@@ -69,6 +89,12 @@ function Cars(props) {
         isOpenDialogMode={isOpenDialogMode}
         setIsOpenDialog={setIsOpenDialog}
         handleSubmit={handleSubmit}
+        dataToEdit={dataToEdit}
+        hasSuccess={() => {
+          getCars();
+          setIsOpenDialog(false);
+        }}
+        categories={categories}
       />
       <Box
         style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}
@@ -85,16 +111,16 @@ function Cars(props) {
             onClick={() => {
               setIsOpenDialog(true);
               setIsOpenDialogMode("Add");
+              setDataToEdit({});
             }}
           >
             Add Car
           </Button>
           <DataGrid
-            rows={rows}
+            rows={cars}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            checkboxSelection
             disableSelectionOnClick
           />
         </Box>{" "}
